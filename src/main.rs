@@ -92,9 +92,25 @@ fn ss(matches: &ArgMatches) -> Result<()> {
     let output = String::from_utf8(output.stdout.as_slice().to_vec())?;
     let lines: Vec<&str> = output.split("\n").collect();
     let mut iter = lines.into_iter();
-    iter.next();
+    iter.next(); // skip the first line.
+
+    
     for line in iter {
-        println!("{}", line);
+        if line.is_empty() {
+            continue;
+        }
+        let data = get_column(line, 4, " ").unwrap_or_default();
+        let data = get_column(&data, 0, ":").unwrap_or_default();
+        dbg!(data);
     }
     Ok(())
+}
+
+fn get_column(line: &str, col: usize, sep: &str) -> Result<String> {
+    let columns: Vec<&str> = line.split(sep).collect();
+    let columns: Vec<&str> = columns.into_iter().filter(|x|{
+        !x.is_empty()
+    }).collect();
+    // dbg!(&columns);
+    Ok(columns[col].to_string())
 }
