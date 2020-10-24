@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use anyhow::Result;
-use clap::{App, Arg};
+use clap::{App, Arg, ArgMatches};
 
 #[derive(Debug)]
 enum SSDirection {
@@ -60,9 +60,14 @@ fn main() -> Result<()> {
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("ss") {
-        let t: SSDirection = matches.value_of_t("direction")?;
-        dbg!(&t);
+        ss(matches)?;
     }
+    Ok(())
+}
+
+fn ss(matches: &ArgMatches) -> Result<()> {
+    let t: SSDirection = matches.value_of_t("direction")?;
+    dbg!(&t);
 
     // let output = Command::new("ss")
     //     .arg("-t")
