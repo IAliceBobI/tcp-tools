@@ -105,7 +105,11 @@ fn ss(matches: &ArgMatches) -> Result<()> {
         let &x: &usize = statistic.get(&data).unwrap_or_else(|| &0);
         statistic.insert(data, x + 1);
     }
-    dbg!(statistic);
+    let mut x: Vec<(String, usize)> = statistic.into_iter().collect();
+    x.sort_by(|(_, c1), (_, c2)| c2.cmp(c1));
+    for (ip, count) in x {
+        println!("{:15} {:5}", ip, count);
+    }
     Ok(())
 }
 
