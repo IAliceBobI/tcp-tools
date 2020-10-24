@@ -35,9 +35,10 @@ fn main() -> Result<()> {
         )
         .get_matches();
 
-    let t: SSDirection = matches.value_of_t("direction")?;
-
-    dbg!(&t);
+    if let Some(matches) = matches.subcommand_matches("ss") {
+        let t: SSDirection = matches.value_of_t("direction")?;
+        dbg!(&t);
+    }
 
     // let output = Command::new("ss")
     //     .arg("-t")
