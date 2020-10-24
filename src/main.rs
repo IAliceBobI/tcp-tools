@@ -107,6 +107,10 @@ fn ss(matches: &ArgMatches) -> Result<()> {
     }
     let mut x: Vec<(String, usize)> = statistic.into_iter().collect();
     x.sort_by(|(_, c1), (_, c2)| c2.cmp(c1));
+    let total: usize = x.iter().fold(0, |s,(_,count)|{
+        s + *count
+    });
+    println!("total connections: {}", total);
     for (ip, count) in x {
         println!("{:15} {:5}", ip, count);
     }
