@@ -102,7 +102,7 @@ fn ss(matches: &ArgMatches) -> Result<()> {
         let data = get_column(line, 4, " ").unwrap_or_default();
         let data = get_column(&data, 0, ":").unwrap_or_default();
         // dbg!(&data);
-        let &x = statistic.get(&data).unwrap_or_else(|| &0);
+        let &x: &usize = statistic.get(&data).unwrap_or_else(|| &0);
         statistic.insert(data, x + 1);
     }
     dbg!(statistic);
