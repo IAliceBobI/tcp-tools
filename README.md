@@ -6,11 +6,21 @@ A tool set of statistic of tcp connections
 #### Software Architecture
 Software architecture description
 
+```
+./tcp-tools ss tcp src 9944
+total connections: 323
+1.2.10.151     89
+1.2.24.215     44
+1.2.61.10      21
+1.2.122.145    19
+1.2.14.21      17
+...
+...
+```
+
 #### Installation
 
-1.  11
-2.  xxxx
-3.  xxxx
+1.  cargo build --release
 
 #### Instructions
 
