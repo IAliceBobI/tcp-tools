@@ -1,4 +1,4 @@
-use std::{process::Command, str::FromStr};
+use std::{collections::BTreeMap, process::Command, str::FromStr};
 
 use anyhow::Result;
 use clap::{App, Arg, ArgMatches};
@@ -94,23 +94,24 @@ fn ss(matches: &ArgMatches) -> Result<()> {
     let mut iter = lines.into_iter();
     iter.next(); // skip the first line.
 
-    
+    let mut statistic: BTreeMap<String, usize> = BTreeMap::new();
     for line in iter {
         if line.is_empty() {
             continue;
         }
         let data = get_column(line, 4, " ").unwrap_or_default();
         let data = get_column(&data, 0, ":").unwrap_or_default();
-        dbg!(data);
+        // dbg!(&data);
+        let x: &usize = statistic.get(&data).unwrap_or_else(|| &0);
+        statistic.insert(data, *x + 1);
     }
+    dbg!(statistic);
     Ok(())
 }
 
 fn get_column(line: &str, col: usize, sep: &str) -> Result<String> {
     let columns: Vec<&str> = line.split(sep).collect();
-    let columns: Vec<&str> = columns.into_iter().filter(|x|{
-        !x.is_empty()
-    }).collect();
+    let columns: Vec<&str> = columns.into_iter().filter(|x| !x.is_empty()).collect();
     // dbg!(&columns);
     Ok(columns[col].to_string())
 }
