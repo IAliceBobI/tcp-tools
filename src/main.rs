@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{process::Command, str::FromStr};
 
 use anyhow::Result;
 use clap::{App, Arg, ArgMatches};
@@ -22,18 +22,18 @@ impl FromStr for SSDirection {
 }
 
 #[derive(Debug)]
-enum Protocol {
+enum SSProtocol {
     Tcp,
     Udp,
 }
 
-impl FromStr for Protocol {
+impl FromStr for SSProtocol {
     type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "tcp" => Ok(Protocol::Tcp),
-            "udp" => Ok(Protocol::Udp),
+            "tcp" => Ok(SSProtocol::Tcp),
+            "udp" => Ok(SSProtocol::Udp),
             _ => Err("no match"),
         }
     }
@@ -55,6 +55,7 @@ fn main() -> Result<()> {
                         .takes_value(true)
                         .required(true)
                         .possible_values(&["src", "dst"]),
+                    Arg::new("port").takes_value(true).required(true),
                 ]),
         )
         .get_matches();
@@ -66,21 +67,34 @@ fn main() -> Result<()> {
 }
 
 fn ss(matches: &ArgMatches) -> Result<()> {
-    let t: SSDirection = matches.value_of_t("direction")?;
-    dbg!(&t);
+    let mut cmd = &mut Command::new("ss");
 
-    // let output = Command::new("ss")
-    //     .arg("-t")
-    //     .arg("dst")
-    //     .arg(":9944")
-    //     .output()
-    //     .expect("Failed to execute command");
-    // let output = String::from_utf8(output.stdout.as_slice().to_vec())?;
-    // let lines: Vec<&str> = output.split("\n").collect();
-    // let mut iter = lines.into_iter();
-    // iter.next();
-    // for line in iter {
-    //     println!("{}", line);
-    // }
+    match matches.value_of_t("protocol")? {
+        SSProtocol::Tcp => {
+            cmd = cmd.arg("-t");
+        }
+        SSProtocol::Udp => {
+            cmd = cmd.arg("-u");
+        }
+    }
+
+    match matches.value_of_t("direction")? {
+        SSDirection::Src => {
+            cmd = cmd.arg("src");
+        }
+        SSDirection::Dst => {
+            cmd = cmd.arg("dst");
+        }
+    }
+    let port: u32 = matches.value_of_t("port").unwrap_or(9944);
+    cmd = cmd.arg(format!(":{}", port));
+    let output = cmd.output().expect("Failed to execute command");
+    let output = String::from_utf8(output.stdout.as_slice().to_vec())?;
+    let lines: Vec<&str> = output.split("\n").collect();
+    let mut iter = lines.into_iter();
+    iter.next();
+    for line in iter {
+        println!("{}", line);
+    }
     Ok(())
 }
