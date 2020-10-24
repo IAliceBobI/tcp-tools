@@ -21,6 +21,24 @@ impl FromStr for SSDirection {
     }
 }
 
+#[derive(Debug)]
+enum Protocol {
+    Tcp,
+    Udp,
+}
+
+impl FromStr for Protocol {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "tcp" => Ok(Protocol::Tcp),
+            "udp" => Ok(Protocol::Udp),
+            _ => Err("no match"),
+        }
+    }
+}
+
 fn main() -> Result<()> {
     let matches = App::new("A tcp tool set")
         .version("1.0")
@@ -28,10 +46,16 @@ fn main() -> Result<()> {
         .about("A tcp tool set")
         .subcommand(
             App::new("ss") // The name we call argument with
-                .arg(
-                    Arg::from("<direction> 'src or dst'")
-                    .possible_values(&["src","dst"])
-                ),
+                .args(&[
+                    Arg::new("protocol")
+                        .takes_value(true)
+                        .required(true)
+                        .possible_values(&["tcp", "udp"]),
+                    Arg::new("direction")
+                        .takes_value(true)
+                        .required(true)
+                        .possible_values(&["src", "dst"]),
+                ]),
         )
         .get_matches();
 
